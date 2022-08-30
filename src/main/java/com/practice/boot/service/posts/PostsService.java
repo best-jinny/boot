@@ -1,6 +1,9 @@
 package com.practice.boot.service.posts;
 
+import com.practice.boot.domain.posts.Posts;
 import com.practice.boot.domain.posts.PostsRepository;
+import com.practice.boot.web.PostsUpdateRequestDto;
+import com.practice.boot.web.dto.PostsResponseDto;
 import com.practice.boot.web.dto.PostsSaveRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,5 +18,21 @@ public class PostsService {
     @Transactional
     public Long save(PostsSaveRequestDto requestDto) {
         return postsRepository.save(requestDto.toEntity()).getId();
+    }
+
+    @Transactional
+    public Long update(Long id, PostsUpdateRequestDto requestDto) {
+        Posts posts = postsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id = " + id));
+
+        posts.update(requestDto.getTitle(), requestDto.getContent());
+
+        return id;
+    }
+
+    public PostsResponseDto findById(Long id) {
+        Posts entity = postsRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id = " + id));
+        return new PostsResponseDto(entity);
     }
 }
